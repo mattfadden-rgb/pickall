@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#0b1220" />
+<title>RIK’s Pick-All 2026</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --bg2: #121a2b;
+    --card: #172033;
+    --line: #2a3754;
+    --text: #e8eefc;
+    --muted: #93a0bb;
+    --accent: #7dd3fc;
+    --good: #34d399;
+    --warn: #fbbf24;
+    --bad: #fb7185;
+    --used: #64748b;
+    --elite: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; }
+  body { padding-bottom: 88px; }
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(11,18,32,.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 14px 8px;
+  }
+  h1 { font-size: 16px; margin: 0 0 2px; letter-spacing: .02em; }
+  .sub { color: var(--muted); font-size: 12px; }
+  .stats { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; }
+  .stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 8px 10px; min-width: 72px; flex: 1;
+  }
+  .stat b { display: block; font-size: 16px; }
+  .stat span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
+  .weekbar { display: flex; gap: 6px; overflow-x: auto; padding: 10px 14px 6px; }
+  .wk {
+    flex: 0 0 auto; width: 42px; height: 42px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--bg2); color: var(--text);
+    font-weight: 700; font-size: 13px;
+  }
+  .wk.on { background: #1d4ed8; border-color: #60a5fa; }
+  .wk.done { outline: 2px solid var(--good); }
+  nav.tabs {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+    display: flex; background: #0e1626; border-top: 1px solid var(--line);
+    padding: 6px 6px calc(8px + env(safe-area-inset-bottom));
+  }
+  nav.tabs button {
+    flex: 1; background: none; border: 0; color: var(--muted);
+    padding: 8px 4px; font-size: 11px; font-weight: 600;
+  }
+  nav.tabs button.on { color: var(--accent); }
+  main { padding: 8px 14px 20px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 12px; margin-bottom: 10px;
+  }
+  .game { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center; }
+  .side {
+    border: 1px solid var(--line); background: var(--bg2); border-radius: 12px;
+    padding: 10px 8px; text-align: center; min-height: 118px;
+  }
+  .side.pick { border-color: var(--good); box-shadow: 0 0 0 1px var(--good) inset; background: #10291f; }
+  .side.used { opacity: .45; }
+  .side.bye { opacity: .35; }
+  .side.save { border-color: var(--elite); }
+  .abbr { font-weight: 800; font-size: 18px; }
+  .meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .prob { font-size: 12px; margin-top: 4px; font-weight: 700; }
+  .prob.hot { color: var(--good); }
+  .mid { text-align: center; font-size: 11px; color: var(--muted); }
+  .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  input, select, textarea {
+    background: var(--bg2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px; font-size: 14px; width: 100%;
+  }
+  input.spread { width: 84px; text-align: center; }
+  button.btn {
+    background: #1d4ed8; color: white; border: 0; border-radius: 10px;
+    padding: 10px 12px; font-weight: 700; font-size: 13px;
+  }
+  button.btn.ghost { background: var(--bg2); color: var(--text); border: 1px solid var(--line); }
+  button.btn.good { background: #047857; }
+  button.btn.warn { background: #92400e; }
+  .grid32 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .tm {
+    border: 1px solid var(--line); background: var(--bg2); border-radius: 10px;
+    padding: 8px 6px; text-align: center; font-size: 12px;
+  }
+  .tm b { display: block; font-size: 14px; }
+  .tm.elite { border-color: #5b21b6; }
+  .tm.dump { border-color: #9f1239; }
+  .tm.gone { opacity: .4; }
+  .badge { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 999px; background: #1e293b; color: var(--muted); }
+  .badge.good { background: #064e3b; color: #6ee7b7; }
+  .badge.bad { background: #4c0519; color: #fda4af; }
+  .badge.save { background: #2e1065; color: #ddd6fe; }
+  .note { font-size: 12px; color: var(--muted); line-height: 1.45; }
+  .blurb { font-size: 11px; color: #cbd5e1; line-height: 1.35; margin-top: 6px; text-align: left; }
+  .blurb.warn { color: var(--warn); }
+  .blurb.bad { color: #fda4af; }
+  .chip { display:inline-block; font-size:10px; letter-spacing:.02em; padding:2px 6px; border-radius:999px; border:1px solid var(--line); color:var(--muted); margin-left:4px; }
+  .chip.due { color:var(--warn); border-color:#7a5b12; }
+  .chip.rest { color:#fda4af; border-color:#7f1d1d; }
+  .chip.plan { color:var(--accent); border-color:#1e4a66; }
+  .conflict { border-color:#7a5b12; background:#2a220d; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { text-align: left; padding: 7px 4px; border-bottom: 1px solid var(--line); }
+  .ok { color: var(--good); } .no { color: var(--bad); } .warnc { color: var(--warn); }
+  h2 { font-size: 15px; margin: 14px 0 8px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 12px; }
+  .toast {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+    background: #065f46; color: white; padding: 8px 12px; border-radius: 8px;
+    font-size: 13px; z-index: 50; display: none;
+  }
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<header>
+  <h1>RIK’s Pick-All 2026</h1>
+  <div class="sub">Use every team once · 2 picks Wk 1–15 · 1 pick Wk 16–17</div>
+  <div class="stats">
+    <div class="stat"><b id="sWins">0–0</b><span>Record</span></div>
+    <div class="stat"><b id="sLeft">32</b><span>Left</span></div>
+    <div class="stat"><b id="sMargin">0</b><span>Net margin</span></div>
+    <div class="stat"><b id="sNeed">0/32</b><span>Graded</span></div>
+  </div>
+</header>
+<div class="weekbar" id="weekbar"></div>
+<main id="app">
+  <div class="card">
+    <b>Week 1 send</b>
+    <div style="font-size:22px;margin:8px 0">LAC + JAX</div>
+    <div class="note">Chargers vs Cardinals (−10.5) and Jaguars vs Browns (−7.5). If this text is all you see, JavaScript did not run — you opened the file in Files Quick Look. In Grok tap the file card and use the in-app preview, or Mail the file to yourself and open the attachment.</div>
+  </div>
+</main>
+<nav class="tabs">
+  <button class="on" data-tab="week">This week</button>
+  <button data-tab="roster">Roster</button>
+  <button data-tab="plan">Plan</button>
+  <button data-tab="results">Results</button>
+  <button data-tab="help">Help</button>
+</nav>
+<script>
+const TEAMS = {
+  ARI:{name:"Cardinals",tier:"dump",wt:3.5,bye:14},
+  ATL:{name:"Falcons",tier:"mid",wt:7.5,bye:11},
+  BAL:{name:"Ravens",tier:"elite",wt:11.5,bye:13},
+  BUF:{name:"Bills",tier:"elite",wt:10.5,bye:7},
+  CAR:{name:"Panthers",tier:"mid",wt:7.5,bye:5},
+  CHI:{name:"Bears",tier:"solid",wt:9.5,bye:10},
+  CIN:{name:"Bengals",tier:"solid",wt:9.5,bye:6},
+  CLE:{name:"Browns",tier:"dump",wt:5.5,bye:11},
+  DAL:{name:"Cowboys",tier:"solid",wt:9.5,bye:14},
+  DEN:{name:"Broncos",tier:"solid",wt:9.5,bye:10},
+  DET:{name:"Lions",tier:"elite",wt:10.5,bye:6},
+  GB:{name:"Packers",tier:"solid",wt:9.5,bye:11},
+  HOU:{name:"Texans",tier:"solid",wt:9.5,bye:8},
+  IND:{name:"Colts",tier:"mid",wt:7.5,bye:13},
+  JAX:{name:"Jaguars",tier:"solid",wt:9.5,bye:7},
+  KC:{name:"Chiefs",tier:"elite",wt:10.5,bye:5},
+  LAC:{name:"Chargers",tier:"elite",wt:10.5,bye:7},
+  LAR:{name:"Rams",tier:"elite",wt:11.5,bye:11},
+  LV:{name:"Raiders",tier:"dump",wt:5.5,bye:13},
+  MIA:{name:"Dolphins",tier:"dump",wt:4.5,bye:6},
+  MIN:{name:"Vikings",tier:"mid",wt:8.5,bye:6},
+  NE:{name:"Patriots",tier:"elite",wt:10.5,bye:11},
+  NO:{name:"Saints",tier:"mid",wt:7.5,bye:8},
+  NYG:{name:"Giants",tier:"mid",wt:7.5,bye:8},
+  NYJ:{name:"Jets",tier:"dump",wt:5.5,bye:13},
+  PHI:{name:"Eagles",tier:"elite",wt:10.5,bye:10},
+  PIT:{name:"Steelers",tier:"mid",wt:8.5,bye:9},
+  SEA:{name:"Seahawks",tier:"elite",wt:10.5,bye:11},
+  SF:{name:"49ers",tier:"elite",wt:10.5,bye:8},
+  TB:{name:"Buccaneers",tier:"mid",wt:8.5,bye:10},
+  TEN:{name:"Titans",tier:"dump",wt:6.5,bye:9},
+  WAS:{name:"Commanders",tier:"mid",wt:7.5,bye:7}
+};
+
+const PLAN = {
+  1:  {picks:["LAC","JAX"], why:"Chargers −10.5 vs Cardinals; Jaguars −7.5 vs Browns. Best two boards on Week 1."},
+  2:  {picks:["PHI","BAL"], why:"Eagles at Titans; Ravens vs Saints. Spend two elites on dump/mid homes."},
+  3:  {picks:["DET","SF"], why:"Lions vs Jets; 49ers vs Cardinals. Why Detroit was saved from Week 1."},
+  4:  {picks:["PIT","MIN"], why:"Steelers at Browns; Vikings vs Dolphins."},
+  5:  {picks:["CIN","HOU"], why:"Bengals at Dolphins; Texans at Titans. Chiefs on bye."},
+  6:  {picks:["LAR","BUF"], why:"Rams vs Cardinals; Bills at Raiders. Lions/Bengals/Dolphins/Vikings on bye."},
+  7:  {picks:["DEN","TEN"], why:"Broncos at Cardinals; Titans vs Browns — dump TEN while they host CLE."},
+  8:  {picks:["DAL","NE"], why:"Cowboys vs Cardinals; Patriots at Dolphins."},
+  9:  {picks:["SEA","NO"], why:"Seahawks vs Cardinals; Saints vs Browns."},
+  10: {picks:["GB","IND"], why:"Packers vs Vikings at Lambeau; Colts vs Dolphins."},
+  11: {picks:["KC","CHI"], why:"Chiefs vs Cardinals — saved KC for this; Bears vs Saints. Six teams on bye."},
+  12: {picks:["TB","MIA"], why:"Bucs vs Panthers; Dolphins vs Jets — hide Miami while they're favored."},
+  13: {picks:["WAS","NYG"], why:"Commanders at used Titans; Giants vs 49ers. Thin week after elites are gone."},
+  14: {picks:["CAR","CLE"], why:"Panthers vs Saints; Browns vs Falcons. Cardinals/Cowboys on bye."},
+  15: {picks:["ARI","LV"], why:"Cardinals vs Jets at home — least-bad Arizona slot; Raiders at Broncos."},
+  16: {picks:["ATL"], why:"One pick. Falcons vs Bucs. Avoid resting-contender games."},
+  17: {picks:["NYJ"], why:"Last dump. Jets vs Vikings. Accept the L if it is one; card is complete."}
+};
+const SUGGEST = {};
+Object.entries(PLAN).forEach(([w,v]) => v.picks.forEach(t => { SUGGEST[t]=Number(w); }));
+const COMMISH = "goforgin123@gmail.com";
+
+const WEEKS = {
+  1:{label:"Sep 9–14", need:2, early:"Wed opener 8:20 ET · Australia Thu 8:35 ET", games:[
+    {away:"NE",home:"SEA",when:"Wed 8:20",homeSpread:-3.5,early:true,due:"1 hr before kick"},
+    {away:"SF",home:"LAR",when:"Thu 8:35 AUS",homeSpread:-3.5,early:true,due:"1 hr before kick",note:"Australia"},
+    {away:"CHI",home:"CAR",when:"Sun 1:00",homeSpread:2.5},
+    {away:"TB",home:"CIN",when:"Sun 1:00",homeSpread:-3.5},
+    {away:"NO",home:"DET",when:"Sun 1:00",homeSpread:-7},
+    {away:"BUF",home:"HOU",when:"Sun 1:00",homeSpread:1.5},
+    {away:"BAL",home:"IND",when:"Sun 1:00",homeSpread:3.5},
+    {away:"CLE",home:"JAX",when:"Sun 1:00",homeSpread:-7.5},
+    {away:"ATL",home:"PIT",when:"Sun 1:00",homeSpread:-3},
+    {away:"NYJ",home:"TEN",when:"Sun 1:00",homeSpread:-1.5},
+    {away:"ARI",home:"LAC",when:"Sun 4:25",homeSpread:-10.5},
+    {away:"MIA",home:"LV",when:"Sun 4:25",homeSpread:-3.5},
+    {away:"GB",home:"MIN",when:"Sun 4:25",homeSpread:-1.5},
+    {away:"WAS",home:"PHI",when:"Sun 4:25",homeSpread:-4.5},
+    {away:"DAL",home:"NYG",when:"Sun 8:20",homeSpread:2.5},
+    {away:"DEN",home:"KC",when:"Mon 8:15",homeSpread:-2.5}
+  ]},
+  2:{label:"Sep 17–21", need:2, games:[
+    {away:"DET",home:"BUF",when:"Thu 8:15"},
+    {away:"CAR",home:"ATL",when:"Sun 1:00"},
+    {away:"NO",home:"BAL",when:"Sun 1:00"},
+    {away:"MIN",home:"CHI",when:"Sun 1:00"},
+    {away:"CIN",home:"HOU",when:"Sun 1:00"},
+    {away:"PIT",home:"NE",when:"Sun 1:00"},
+    {away:"GB",home:"NYJ",when:"Sun 1:00"},
+    {away:"CLE",home:"TB",when:"Sun 1:00"},
+    {away:"PHI",home:"TEN",when:"Sun 1:00"},
+    {away:"JAX",home:"DEN",when:"Sun 4:05"},
+    {away:"LV",home:"LAC",when:"Sun 4:05"},
+    {away:"SEA",home:"ARI",when:"Sun 4:25"},
+    {away:"WAS",home:"DAL",when:"Sun 4:25"},
+    {away:"MIA",home:"SF",when:"Sun 4:25"},
+    {away:"IND",home:"KC",when:"Sun 8:20"},
+    {away:"NYG",home:"LAR",when:"Mon 8:15"}
+  ]},
+  3:{label:"Sep 24–28", need:2, early:"Rio game Sun 4:25 ET", games:[
+    {away:"ATL",home:"GB",when:"Thu 8:15"},
+    {away:"LAC",home:"BUF",when:"Sun 1:00"},
+    {away:"CAR",home:"CLE",when:"Sun 1:00"},
+    {away:"NYJ",home:"DET",when:"Sun 1:00"},
+    {away:"HOU",home:"IND",when:"Sun 1:00"},
+    {away:"NE",home:"JAX",when:"Sun 1:00"},
+    {away:"KC",home:"MIA",when:"Sun 1:00"},
+    {away:"TEN",home:"NYG",when:"Sun 1:00"},
+    {away:"CIN",home:"PIT",when:"Sun 1:00"},
+    {away:"SEA",home:"WAS",when:"Sun 1:00"},
+    {away:"ARI",home:"SF",when:"Sun 4:05"},
+    {away:"MIN",home:"TB",when:"Sun 4:05"},
+    {away:"BAL",home:"DAL",when:"Sun 4:25",note:"Rio — international"},
+    {away:"LV",home:"NO",when:"Sun 4:25"},
+    {away:"LAR",home:"DEN",when:"Sun 8:20"},
+    {away:"PHI",home:"CHI",when:"Mon 8:15"}
+  ]},
+  4:{label:"Oct 1–5", need:2, early:"London 9:30a — picks due Sat 11pm ET", games:[
+    {away:"PIT",home:"CLE",when:"Thu 8:15"},
+    {away:"IND",home:"WAS",when:"Sun 9:30 LON",note:"London — due Sat 11pm ET",early:true},
+    {away:"TEN",home:"BAL",when:"Sun 1:00"},
+    {away:"NE",home:"BUF",when:"Sun 1:00"},
+    {away:"NYJ",home:"CHI",when:"Sun 1:00"},
+    {away:"JAX",home:"CIN",when:"Sun 1:00"},
+    {away:"DAL",home:"HOU",when:"Sun 1:00"},
+    {away:"ARI",home:"NYG",when:"Sun 1:00"},
+    {away:"LAR",home:"PHI",when:"Sun 1:00"},
+    {away:"GB",home:"TB",when:"Sun 1:00"},
+    {away:"MIA",home:"MIN",when:"Sun 4:05"},
+    {away:"KC",home:"LV",when:"Sun 4:25"},
+    {away:"LAC",home:"SEA",when:"Sun 4:25"},
+    {away:"DEN",home:"SF",when:"Sun 4:25"},
+    {away:"DET",home:"CAR",when:"Sun 8:20"},
+    {away:"ATL",home:"NO",when:"Mon 8:15"}
+  ]},
+  5:{label:"Oct 8–12", need:2, early:"London 9:30a — due Sat 11pm ET", byes:["CAR","KC"], games:[
+    {away:"TB",home:"DAL",when:"Thu 8:15"},
+    {away:"PHI",home:"JAX",when:"Sun 9:30 LON",early:true,note:"London"},
+    {away:"CIN",home:"MIA",when:"Sun 1:00"},
+    {away:"LV",home:"NE",when:"Sun 1:00"},
+    {away:"MIN",home:"NO",when:"Sun 1:00"},
+    {away:"CLE",home:"NYJ",when:"Sun 1:00"},
+    {away:"IND",home:"PIT",when:"Sun 1:00"},
+    {away:"HOU",home:"TEN",when:"Sun 1:00"},
+    {away:"NYG",home:"WAS",when:"Sun 1:00"},
+    {away:"DEN",home:"LAC",when:"Sun 4:05"},
+    {away:"DET",home:"ARI",when:"Sun 4:25"},
+    {away:"CHI",home:"GB",when:"Sun 4:25"},
+    {away:"SF",home:"SEA",when:"Sun 4:25"},
+    {away:"BAL",home:"ATL",when:"Sun 8:20"},
+    {away:"BUF",home:"LAR",when:"Mon 8:15"}
+  ]},
+  6:{label:"Oct 15–19", need:2, early:"London 9:30a — due Sat 11pm ET", byes:["CIN","DET","MIA","MIN"], games:[
+    {away:"SEA",home:"DEN",when:"Thu 8:15"},
+    {away:"HOU",home:"JAX",when:"Sun 9:30 LON",early:true,note:"London"},
+    {away:"CHI",home:"ATL",when:"Sun 1:00"},
+    {away:"BAL",home:"CLE",when:"Sun 1:00"},
+    {away:"TEN",home:"IND",when:"Sun 1:00"},
+    {away:"NYJ",home:"NE",when:"Sun 1:00"},
+    {away:"NO",home:"NYG",when:"Sun 1:00"},
+    {away:"CAR",home:"PHI",when:"Sun 1:00"},
+    {away:"PIT",home:"TB",when:"Sun 1:00"},
+    {away:"ARI",home:"LAR",when:"Sun 4:05"},
+    {away:"LAC",home:"KC",when:"Sun 4:25"},
+    {away:"BUF",home:"LV",when:"Sun 4:25"},
+    {away:"DAL",home:"GB",when:"Sun 8:20"},
+    {away:"WAS",home:"SF",when:"Mon 8:15"}
+  ]},
+  7:{label:"Oct 22–26", need:2, early:"Paris 9:30a — due Sat 11pm ET", byes:["BUF","JAX","LAC","WAS"], games:[
+    {away:"NE",home:"CHI",when:"Thu 8:15"},
+    {away:"PIT",home:"NO",when:"Sun 9:30 PAR",early:true,note:"Paris"},
+    {away:"SF",home:"ATL",when:"Sun 1:00"},
+    {away:"CIN",home:"BAL",when:"Sun 1:00"},
+    {away:"TB",home:"CAR",when:"Sun 1:00"},
+    {away:"NYG",home:"HOU",when:"Sun 1:00"},
+    {away:"IND",home:"MIN",when:"Sun 1:00"},
+    {away:"MIA",home:"NYJ",when:"Sun 1:00"},
+    {away:"CLE",home:"TEN",when:"Sun 1:00"},
+    {away:"DEN",home:"ARI",when:"Sun 4:05"},
+    {away:"GB",home:"DET",when:"Sun 4:25"},
+    {away:"LAR",home:"LV",when:"Sun 4:25"},
+    {away:"KC",home:"SEA",when:"Sun 8:20"},
+    {away:"DAL",home:"PHI",when:"Mon 8:15"}
+  ]},
+  8:{label:"Oct 29–Nov 2", need:2, byes:["HOU","NO","NYG","SF"], games:[
+    {away:"CAR",home:"GB",when:"Thu 8:15"},
+    {away:"BAL",home:"BUF",when:"Sun 1:00"},
+    {away:"TEN",home:"CIN",when:"Sun 1:00"},
+    {away:"ARI",home:"DAL",when:"Sun 1:00"},
+    {away:"MIN",home:"DET",when:"Sun 1:00"},
+    {away:"IND",home:"JAX",when:"Sun 1:00"},
+    {away:"LV",home:"NYJ",when:"Sun 1:00"},
+    {away:"CLE",home:"PIT",when:"Sun 1:00"},
+    {away:"ATL",home:"TB",when:"Sun 1:00"},
+    {away:"LAC",home:"LAR",when:"Sun 4:05"},
+    {away:"KC",home:"DEN",when:"Sun 4:25"},
+    {away:"NE",home:"MIA",when:"Sun 4:25"},
+    {away:"PHI",home:"WAS",when:"Sun 8:20"},
+    {away:"CHI",home:"SEA",when:"Mon 8:15"}
+  ]},
+  9:{label:"Nov 5–9", need:2, early:"Madrid 9:30a — due Sat 11pm ET", byes:["PIT","TEN"], games:[
+    {away:"JAX",home:"BAL",when:"Thu 8:15"},
+    {away:"CIN",home:"ATL",when:"Sun 9:30 MAD",early:true,note:"Madrid"},
+    {away:"DEN",home:"CAR",when:"Sun 1:00"},
+    {away:"DAL",home:"IND",when:"Sun 1:00"},
+    {away:"NYJ",home:"KC",when:"Sun 1:00"},
+    {away:"DET",home:"MIA",when:"Sun 1:00"},
+    {away:"CLE",home:"NO",when:"Sun 1:00"},
+    {away:"NYG",home:"PHI",when:"Sun 1:00"},
+    {away:"LAR",home:"WAS",when:"Sun 1:00"},
+    {away:"HOU",home:"LAC",when:"Sun 4:05"},
+    {away:"LV",home:"SF",when:"Sun 4:05"},
+    {away:"GB",home:"NE",when:"Sun 4:25"},
+    {away:"ARI",home:"SEA",when:"Sun 4:25"},
+    {away:"TB",home:"CHI",when:"Sun 8:20"},
+    {away:"BUF",home:"MIN",when:"Mon 8:15"}
+  ]},
+  10:{label:"Nov 12–16", need:2, early:"Munich 9:30a — due Sat 11pm ET", byes:["CHI","DEN","PHI","TB"], games:[
+    {away:"WAS",home:"NYG",when:"Thu 8:15"},
+    {away:"NE",home:"DET",when:"Sun 9:30 MUN",early:true,note:"Munich"},
+    {away:"KC",home:"ATL",when:"Sun 1:00"},
+    {away:"HOU",home:"CLE",when:"Sun 1:00"},
+    {away:"MIN",home:"GB",when:"Sun 1:00"},
+    {away:"MIA",home:"IND",when:"Sun 1:00"},
+    {away:"CAR",home:"NO",when:"Sun 1:00"},
+    {away:"BUF",home:"NYJ",when:"Sun 1:00"},
+    {away:"JAX",home:"TEN",when:"Sun 1:00"},
+    {away:"LAR",home:"ARI",when:"Sun 4:05"},
+    {away:"SEA",home:"LV",when:"Sun 4:05"},
+    {away:"SF",home:"DAL",when:"Sun 4:25"},
+    {away:"PIT",home:"CIN",when:"Sun 8:20"},
+    {away:"LAC",home:"BAL",when:"Mon 8:15"}
+  ]},
+  11:{label:"Nov 19–23", need:2, byes:["ATL","CLE","GB","LAR","NE","SEA"], games:[
+    {away:"IND",home:"HOU",when:"Thu 8:15"},
+    {away:"MIA",home:"BUF",when:"Sun 1:00"},
+    {away:"BAL",home:"CAR",when:"Sun 1:00"},
+    {away:"NO",home:"CHI",when:"Sun 1:00"},
+    {away:"TEN",home:"DAL",when:"Sun 1:00"},
+    {away:"TB",home:"DET",when:"Sun 1:00"},
+    {away:"ARI",home:"KC",when:"Sun 1:00"},
+    {away:"JAX",home:"NYG",when:"Sun 1:00"},
+    {away:"NYJ",home:"LAC",when:"Sun 4:05"},
+    {away:"LV",home:"DEN",when:"Sun 4:25"},
+    {away:"PIT",home:"PHI",when:"Sun 4:25"},
+    {away:"MIN",home:"SF",when:"Sun 8:20",note:"Mexico City"},
+    {away:"CIN",home:"WAS",when:"Mon 8:15"}
+  ]},
+  12:{label:"Nov 25–30 Thanksgiving", need:2, games:[
+    {away:"GB",home:"LAR",when:"Wed 8:00"},
+    {away:"CHI",home:"DET",when:"Thu 1:00"},
+    {away:"PHI",home:"DAL",when:"Thu 4:30"},
+    {away:"KC",home:"BUF",when:"Thu 8:20"},
+    {away:"DEN",home:"PIT",when:"Fri 3:00"},
+    {away:"NO",home:"CIN",when:"Sun 1:00"},
+    {away:"LV",home:"CLE",when:"Sun 1:00"},
+    {away:"BAL",home:"HOU",when:"Sun 1:00"},
+    {away:"NYG",home:"IND",when:"Sun 1:00"},
+    {away:"NYJ",home:"MIA",when:"Sun 1:00"},
+    {away:"ATL",home:"MIN",when:"Sun 1:00"},
+    {away:"TEN",home:"JAX",when:"Sun 4:05"},
+    {away:"WAS",home:"ARI",when:"Sun 4:25"},
+    {away:"SEA",home:"SF",when:"Sun 4:25"},
+    {away:"NE",home:"LAC",when:"Sun 8:20"},
+    {away:"CAR",home:"TB",when:"Mon 8:15"}
+  ]},
+  13:{label:"Dec 3–7", need:2, byes:["BAL","IND","LV","NYJ"], games:[
+    {away:"KC",home:"LAR",when:"Thu 8:15"},
+    {away:"DET",home:"ATL",when:"Sun 1:00"},
+    {away:"JAX",home:"CHI",when:"Sun 1:00"},
+    {away:"CIN",home:"CLE",when:"Sun 1:00"},
+    {away:"GB",home:"NO",when:"Sun 1:00"},
+    {away:"SF",home:"NYG",when:"Sun 1:00"},
+    {away:"LAC",home:"TB",when:"Sun 1:00"},
+    {away:"WAS",home:"TEN",when:"Sun 1:00"},
+    {away:"PHI",home:"ARI",when:"Sun 4:05"},
+    {away:"MIA",home:"DEN",when:"Sun 4:05"},
+    {away:"CAR",home:"MIN",when:"Sun 4:25"},
+    {away:"BUF",home:"NE",when:"Sun 4:25"},
+    {away:"HOU",home:"PIT",when:"Sun 8:20"},
+    {away:"DAL",home:"SEA",when:"Mon 8:15"}
+  ]},
+  14:{label:"Dec 10–14", need:2, byes:["ARI","DAL"], games:[
+    {away:"MIN",home:"NE",when:"Thu 8:15"},
+    {away:"TB",home:"BAL",when:"Sun 1:00"},
+    {away:"NO",home:"CAR",when:"Sun 1:00"},
+    {away:"ATL",home:"CLE",when:"Sun 1:00"},
+    {away:"TEN",home:"DET",when:"Sun 1:00"},
+    {away:"CHI",home:"MIA",when:"Sun 1:00"},
+    {away:"DEN",home:"NYJ",when:"Sun 1:00"},
+    {away:"IND",home:"PHI",when:"Sun 1:00"},
+    {away:"HOU",home:"WAS",when:"Sun 1:00"},
+    {away:"LAC",home:"LV",when:"Sun 4:05"},
+    {away:"KC",home:"CIN",when:"Sun 4:25"},
+    {away:"NYG",home:"SEA",when:"Sun 4:25"},
+    {away:"LAR",home:"SF",when:"Sun 4:25"},
+    {away:"BUF",home:"GB",when:"Sun 8:20"},
+    {away:"PIT",home:"JAX",when:"Mon 8:15"}
+  ]},
+  15:{label:"Dec 17–21", need:2, games:[
+    {away:"SF",home:"LAC",when:"Thu 8:15"},
+    {away:"SEA",home:"PHI",when:"Sat 5:00"},
+    {away:"CHI",home:"BUF",when:"Sat 8:20"},
+    {away:"CIN",home:"CAR",when:"Sun 1:00"},
+    {away:"MIA",home:"GB",when:"Sun 1:00"},
+    {away:"JAX",home:"HOU",when:"Sun 1:00"},
+    {away:"CLE",home:"NYG",when:"Sun 1:00"},
+    {away:"BAL",home:"PIT",when:"Sun 1:00"},
+    {away:"NO",home:"TB",when:"Sun 1:00"},
+    {away:"IND",home:"TEN",when:"Sun 1:00"},
+    {away:"ATL",home:"WAS",when:"Sun 1:00"},
+    {away:"NYJ",home:"ARI",when:"Sun 4:05"},
+    {away:"DAL",home:"LAR",when:"Sun 4:25"},
+    {away:"DEN",home:"LV",when:"Sun 4:25"},
+    {away:"DET",home:"MIN",when:"Sun 8:20"},
+    {away:"NE",home:"KC",when:"Mon 8:15"}
+  ]},
+  16:{label:"Dec 24–28 · ONE PICK", need:1, games:[
+    {away:"HOU",home:"PHI",when:"Thu 8:15"},
+    {away:"GB",home:"CHI",when:"Fri 1:00"},
+    {away:"BUF",home:"DEN",when:"Fri 4:30"},
+    {away:"LAR",home:"SEA",when:"Fri 8:15"},
+    {away:"TB",home:"ATL",when:"Sun flex"},
+    {away:"CIN",home:"IND",when:"Sun flex"},
+    {away:"WAS",home:"MIN",when:"Sun flex"},
+    {away:"CAR",home:"PIT",when:"Sun flex"},
+    {away:"CLE",home:"BAL",when:"Sun 1:00"},
+    {away:"LAC",home:"MIA",when:"Sun 1:00"},
+    {away:"ARI",home:"NO",when:"Sun 1:00"},
+    {away:"NE",home:"NYJ",when:"Sun 1:00"},
+    {away:"TEN",home:"LV",when:"Sun 4:05"},
+    {away:"SF",home:"KC",when:"Sun 4:25"},
+    {away:"JAX",home:"DAL",when:"Sun 8:20"},
+    {away:"NYG",home:"DET",when:"Mon 8:15"}
+  ]},
+  17:{label:"Dec 31–Jan 4 · ONE PICK", need:1, games:[
+    {away:"BAL",home:"CIN",when:"Thu 8:15"},
+    {away:"WAS",home:"JAX",when:"Sun flex"},
+    {away:"KC",home:"LAC",when:"Sun flex"},
+    {away:"DEN",home:"NE",when:"Sun flex"},
+    {away:"LAR",home:"TB",when:"Sun flex"},
+    {away:"NO",home:"ATL",when:"Sun 1:00"},
+    {away:"SEA",home:"CAR",when:"Sun 1:00"},
+    {away:"IND",home:"CLE",when:"Sun 1:00"},
+    {away:"NYG",home:"DAL",when:"Sun 1:00"},
+    {away:"BUF",home:"MIA",when:"Sun 1:00"},
+    {away:"MIN",home:"NYJ",when:"Sun 1:00"},
+    {away:"PIT",home:"TEN",when:"Sun 1:00"},
+    {away:"LV",home:"ARI",when:"Sun 4:05"},
+    {away:"DET",home:"CHI",when:"Sun 4:25"},
+    {away:"PHI",home:"SF",when:"Sun 8:20"},
+    {away:"HOU",home:"GB",when:"Mon 8:15"}
+  ]}
+};
+
+const KEY = "rik-pickall-2026-v2";
+const ESPN_ABBR = {WSH:"WAS", WAS:"WAS"};
+const ESPN_ID = {1:"ATL",2:"BUF",3:"CHI",4:"CIN",5:"CLE",6:"DAL",7:"DEN",8:"DET",9:"GB",10:"TEN",11:"IND",12:"KC",13:"LV",14:"LAR",15:"MIA",16:"MIN",17:"NE",18:"NO",19:"NYG",20:"NYJ",21:"PHI",22:"ARI",23:"PIT",24:"LAC",25:"SF",26:"SEA",27:"TB",28:"WAS",29:"CAR",30:"JAX",33:"BAL",34:"HOU"};
+const NAME_ABBR = {
+  "Arizona Cardinals":"ARI","Atlanta Falcons":"ATL","Baltimore Ravens":"BAL","Buffalo Bills":"BUF",
+  "Carolina Panthers":"CAR","Chicago Bears":"CHI","Cincinnati Bengals":"CIN","Cleveland Browns":"CLE",
+  "Dallas Cowboys":"DAL","Denver Broncos":"DEN","Detroit Lions":"DET","Green Bay Packers":"GB",
+  "Houston Texans":"HOU","Indianapolis Colts":"IND","Jacksonville Jaguars":"JAX","Kansas City Chiefs":"KC",
+  "Las Vegas Raiders":"LV","Los Angeles Chargers":"LAC","Los Angeles Rams":"LAR","Miami Dolphins":"MIA",
+  "Minnesota Vikings":"MIN","New England Patriots":"NE","New Orleans Saints":"NO","New York Giants":"NYG",
+  "New York Jets":"NYJ","Philadelphia Eagles":"PHI","Pittsburgh Steelers":"PIT","San Francisco 49ers":"SF",
+  "Seattle Seahawks":"SEA","Tampa Bay Buccaneers":"TB","Tennessee Titans":"TEN","Washington Commanders":"WAS"
+};
+const KEY_POS = {QB:6, RB:5, WR:4, TE:3, OT:3, G:2, C:2, DE:3, LB:2, CB:2, S:1, DT:2, NT:2, FB:1};
+const state = load();
+let tab = "week";
+let week = state.week || 1;
+let pulling = false;
+
+function load(){
+  try {
+    const s = Object.assign(defaultState(), JSON.parse(localStorage.getItem(KEY)) || {});
+    s.lines = s.lines || {};
+    s.lineMeta = s.lineMeta || {};
+    s.desk = s.desk || {};
+    return s;
+  } catch(e){ return defaultState(); }
+}
+function defaultState(){
+  return {
+    week:1,
+    picks:{},
+    results:{},
+    lines:{},
+    lineMeta:{},
+    desk:{},
+    notes:""
+  };
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+function usedMap(){
+  const m = {};
+  for (const [w, arr] of Object.entries(state.picks)) {
+    (arr||[]).forEach(t => { if(t) m[t] = Number(w); });
+  }
+  return m;
+}
+function remaining(){
+  const used = usedMap();
+  return Object.keys(TEAMS).filter(t => !used[t]);
+}
+function record(){
+  let w=0,l=0,margin=0,pending=0,graded=0,picked=0;
+  const byWeek = {};
+  for (let wk=1; wk<=17; wk++){
+    const arr = state.picks[wk]||[];
+    byWeek[wk] = {w:0,l:0,margin:0,pending:0};
+    arr.forEach(t => {
+      picked++;
+      const r = (state.results[wk]||{})[t];
+      if (!r || !r.wl) { pending++; byWeek[wk].pending++; return; }
+      graded++;
+      const mg = Number(r.margin||0);
+      if (r.wl === "W") { w++; byWeek[wk].w++; margin += mg; byWeek[wk].margin += mg; }
+      else { l++; byWeek[wk].l++; margin += mg; byWeek[wk].margin += mg; }
+    });
+  }
+  return {w,l,margin,pending,graded,picked,left:32-picked,byWeek};
+}
+function findGame(wk, team){
+  return (WEEKS[wk]&&WEEKS[wk].games||[]).find(g => g.home===team || g.away===team);
+}
+function signedMargin(wl, raw){
+  const n = Number(raw);
+  if (raw==="" || raw==null || Number.isNaN(n)) return wl==="L"?0:"";
+  if (wl==="W") return Math.abs(n);
+  if (wl==="L") return -Math.abs(n);
+  return n;
+}
+async function pullEspnResults(wk){
+  try {
+    const url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week="+wk;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP "+res.status);
+    const data = await res.json();
+    const picks = state.picks[wk]||[];
+    if (!picks.length) return 0;
+    let n=0;
+    (data.events||[]).forEach(ev => {
+      const c = (ev.competitions||[])[0];
+      if (!c) return;
+      const done = c.status?.type?.completed;
+      const home = normAbbr((c.competitors.find(t=>t.homeAway==="home")||{}).team?.abbreviation);
+      const away = normAbbr((c.competitors.find(t=>t.homeAway==="away")||{}).team?.abbreviation);
+      const hs = Number((c.competitors.find(t=>t.homeAway==="home")||{}).score);
+      const as = Number((c.competitors.find(t=>t.homeAway==="away")||{}).score);
+      picks.forEach(team => {
+        if (team!==home && team!==away) return;
+        if (!done) return;
+        const my = team===home ? hs : as;
+        const opp = team===home ? as : hs;
+        const tie = my===opp;
+        const wl = (!tie && my>opp) ? "W" : "L";
+        const margin = my-opp;
+        state.results[wk]=state.results[wk]||{};
+        state.results[wk][team]={wl, margin, auto:true, score:away+" "+as+"–"+hs+" "+home};
+        n++;
+      });
+    });
+    save();
+    return n;
+  } catch(err){
+    toast("Could not pull scores from ESPN.");
+    console.error(err);
+    return 0;
+  }
+}
+
+function spreadToProb(teamSpread){
+  if (teamSpread == null || Number.isNaN(teamSpread)) return null;
+  return 1 / (1 + Math.exp(0.15 * teamSpread));
+}
+function estSpread(team, opp, home){
+  const gap = TEAMS[team].wt - TEAMS[opp].wt;
+  return -(gap * 1.35 + (home ? 2.2 : -2.2));
+}
+function normAbbr(a){
+  if (!a) return a;
+  const u = a.toUpperCase();
+  return ESPN_ABBR[u] || u;
+}
+function parseAmerican(ml){
+  const n = Number(String(ml).replace("+",""));
+  if (!n) return null;
+  return n < 0 ? (-n)/((-n)+100) : 100/(n+100);
+}
+async function pullEspnLines(wk, {silent}={}){
+  pulling = true;
+  if (!silent) toast("Pulling ESPN / DraftKings lines…");
+  try {
+    const url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=2&week="+wk;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP "+res.status);
+    const data = await res.json();
+    let n = 0;
+    (data.events||[]).forEach(ev => {
+      const c = (ev.competitions||[])[0];
+      if (!c) return;
+      const home = normAbbr((c.competitors.find(t=>t.homeAway==="home")||{}).team?.abbreviation);
+      const away = normAbbr((c.competitors.find(t=>t.homeAway==="away")||{}).team?.abbreviation);
+      const o = (c.odds||[])[0];
+      if (!home || !away || !o) return;
+      let hs = null;
+      const raw = o.pointSpread?.home?.close?.line;
+      if (raw != null && raw !== "") hs = Number(String(raw).replace("+",""));
+      else if (typeof o.spread === "number") hs = o.homeTeamOdds?.favorite ? Number(o.spread) : Number(o.spread);
+      // ESPN spread is negative when home is favorite; when away is favorite spread is positive on the top-level field.
+      if (hs == null && o.details) {
+        const m = String(o.details).match(/([A-Z]{2,3})\s*([+-]?\d+\.?\d*)/);
+        if (m) {
+          const fav = normAbbr(m[1]);
+          const mag = Number(m[2]);
+          hs = fav === home ? mag : -mag;
+        }
+      }
+      if (hs == null || Number.isNaN(hs)) return;
+      const key = wk+":"+away+"@"+home;
+      state.lines[key] = hs;
+      const homeML = o.moneyline?.home?.close?.odds || o.moneyline?.home?.odds;
+      const awayML = o.moneyline?.away?.close?.odds || o.moneyline?.away?.odds;
+      state.lineMeta[key] = {
+        details: o.details || "",
+        ou: o.overUnder,
+        homeML, awayML,
+        src: (o.provider&&o.provider.name)||"ESPN",
+        pulled: new Date().toISOString()
+      };
+      n++;
+    });
+    save();
+    toast(n ? ("Loaded "+n+" "+((state.lineMeta[Object.keys(state.lineMeta).find(k=>k.startsWith(wk+":"))]||{}).src||"ESPN")+" lines") : "No lines posted for this week yet");
+    return n;
+  } catch (err) {
+    toast("Could not reach ESPN from this page. Open in Safari, or check signal.");
+    console.error(err);
+    return 0;
+  } finally {
+    pulling = false;
+  }
+}
+
+function posAbbr(ath){
+  const p = ath && ath.position;
+  if (!p) return "";
+  return (typeof p === "string") ? p : (p.abbreviation || "");
+}
+function teamFromInjury(teamObj){
+  return ESPN_ID[teamObj.id] || NAME_ABBR[teamObj.displayName] || "";
+}
+async function pullEspnDesk({silent}={}){
+  try {
+    const [injRes, newsRes] = await Promise.all([
+      fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries"),
+      fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/news?limit=50")
+    ]);
+    const inj = injRes.ok ? await injRes.json() : {injuries:[]};
+    const news = newsRes.ok ? await newsRes.json() : {articles:[]};
+    const desk = {};
+    Object.keys(TEAMS).forEach(t => desk[t] = {inj:[], news:[], qbOut:false, flag:""});
+    (inj.injuries||[]).forEach(teamObj => {
+      const abbr = teamFromInjury(teamObj);
+      if (!desk[abbr]) return;
+      (teamObj.injuries||[]).forEach(item => {
+        const st = item.status || "";
+        if (!st || st === "Active") return;
+        const ath = item.athlete || {};
+        const pos = posAbbr(ath);
+        if (["K","P","LS"].includes(pos)) return;
+        const type = (item.type && item.type.abbreviation) || (item.details && item.details.type) || "";
+        const comment = (item.shortComment||"")+" "+(item.longComment||"");
+        const name = ath.displayName || ath.shortName || "Player";
+        const last = ath.lastName || name.split(" ").slice(-1)[0];
+        const hard = /^(Out|Doubtful|Injured Reserve|Suspension)$/i.test(st) || /PUP|NFI|did not practice|\bDNP\b/i.test(comment);
+        const skill = ["QB","RB","WR","TE","OT"].includes(pos);
+        if (!hard && st==="Questionable") {
+          if (!skill) return;
+          if (/preseason|Saturday's preseason|Friday's preseason/i.test(comment)) return;
+        }
+        const weight = (KEY_POS[pos]||0) + (hard?8:0) + (st==="Out"||st==="Doubtful"?4:0) + (pos==="QB"?6:0);
+        if (weight < 4) return;
+        desk[abbr].inj.push({name, last, pos, st: hard && st==="Questionable" ? "DNP/Q" : st, type, weight, hard, comment});
+        if (pos==="QB" && (hard || /Out|Doubtful|Injured Reserve|Suspension/i.test(st))) desk[abbr].qbOut = true;
+      });
+      desk[abbr].inj.sort((a,b)=>b.weight-a.weight);
+    });
+    const city = {};
+    Object.entries(TEAMS).forEach(([ab,t]) => {
+      city[ab] = [ab, t.name, t.name.split(" ").pop()].filter(Boolean);
+    });
+    (news.articles||[]).forEach(a => {
+      const h = a.headline || a.title || "";
+      if (!h) return;
+      const hl = h.toLowerCase();
+      Object.entries(city).forEach(([ab, keys]) => {
+        if (keys.some(k => hl.includes(String(k).toLowerCase()))) {
+          if (desk[ab].news.length < 2) desk[ab].news.push(h);
+        }
+      });
+    });
+    Object.keys(desk).forEach(ab => {
+      const hard = desk[ab].inj.filter(i=>i.hard);
+      const show = (hard.length?hard:desk[ab].inj).slice(0,2);
+      const bits = show.map(i => {
+        const tag = i.st==="Injured Reserve"?"IR":i.st;
+        return (i.pos?i.pos+" ":"")+i.last+" "+tag+(i.type && i.type.length<16?" ("+i.type+")":"");
+      });
+      if (!bits.length && desk[ab].news[0]) bits.push(desk[ab].news[0]);
+      else if (desk[ab].news[0] && /start|QB|out|IR|PUP|knee|ACL|trade/i.test(desk[ab].news[0])) bits.push(desk[ab].news[0]);
+      desk[ab].line = bits.join(" · ") || "No hard outs in ESPN feed.";
+      if (desk[ab].qbOut) desk[ab].flag = "QB out/doubtful";
+    });
+    state.desk = desk;
+    state.deskPulled = new Date().toISOString();
+    save();
+    if (!silent) toast("Updated injuries and news");
+    return true;
+  } catch(err){
+    console.error(err);
+    if (!silent) toast("Injury/news feed failed");
+    return false;
+  }
+}
+function teamBlurb(team){
+  return (state.desk && state.desk[team]) || {line:"", flag:"", qbOut:false};
+}
+function gameDue(g){
+  if (g.due) return g.due;
+  const w = (g.when||"");
+  if (g.early || /LON|PAR|MAD|MUN|9:30|AUS|Europe/i.test(w+(g.note||""))) {
+    if (/Wed|Thu|Fri|AUS/i.test(w) && !/9:30/i.test(w)) return "due 1 hr before kick";
+    return "due Sat 11:00p ET";
+  }
+  if (/^Wed|^Thu|^Fri/i.test(w)) return "due 1 hr before kick";
+  return "due Sun 11:30a ET";
+}
+function restRisk(team, wk){
+  if (wk < 16) return false;
+  return TEAMS[team].wt >= 9.5 || TEAMS[team].tier === "elite";
+}
+async function refreshWeekData(wk, opts={}){
+  await Promise.all([pullEspnLines(wk, opts), pullEspnDesk(opts)]);
+}
+
+function gameLine(wk, g){
+  const key = wk+":"+g.away+"@"+g.home;
+  if (state.lines[key] != null && state.lines[key] !== "") return Number(state.lines[key]);
+  if (g.homeSpread != null) return g.homeSpread;
+  return estSpread(g.home, g.away, true);
+}
+function teamSpread(wk, g, team){
+  const hs = gameLine(wk, g);
+  return team === g.home ? hs : -hs;
+}
+function bestFuture(team, fromWeek){
+  let best = {week:null, opp:null, gap:-99, home:false};
+  for (let w = fromWeek+1; w<=17; w++){
+    if (TEAMS[team].bye === w) continue;
+    const g = (WEEKS[w].games||[]).find(x => x.home===team || x.away===team);
+    if (!g) continue;
+    const opp = g.home===team ? g.away : g.home;
+    const home = g.home===team;
+    const gap = TEAMS[team].wt - TEAMS[opp].wt + (home?1.2:0);
+    if (gap > best.gap) best = {week:w, opp, gap, home};
+  }
+  return best;
+}
+
+function recommend(wk){
+  const used = usedMap();
+  const info = WEEKS[wk];
+  const cands = [];
+  (info.games||[]).forEach(g => {
+    [g.away,g.home].forEach(team => {
+      if (used[team] && used[team] !== wk) return;
+      const ts = teamSpread(wk,g,team);
+      const meta = state.lineMeta[wk+":"+g.away+"@"+g.home] || {};
+      const ml = team===g.home ? meta.homeML : meta.awayML;
+      let p = parseAmerican(ml) || spreadToProb(ts);
+      if (teamBlurb(team).qbOut && p) p = Math.max(0.15, p-0.14);
+      const rest = restRisk(team, wk);
+      if (rest && p) p = Math.max(0.18, p-0.16);
+      const opp = team===g.home?g.away:g.home;
+      const fut = bestFuture(team, wk);
+      const thisGap = TEAMS[team].wt - TEAMS[opp].wt + (team===g.home?1.2:0);
+      let save = false;
+      if (TEAMS[team].tier==="elite" && fut.week && fut.gap >= thisGap + 3.5 && p < 0.72) save = true;
+      if (SUGGEST[team] && SUGGEST[team] > wk && TEAMS[team].tier==="elite" && p < 0.70) save = true;
+      if (rest) save = true;
+      cands.push({team, opp, home:team===g.home, p, ts, thisGap, fut, save, rest, when:g.when, due:gameDue(g)});
+    });
+  });
+  cands.sort((a,b) => {
+    const as = (a.save?-0.12:0) + (a.p||0);
+    const bs = (b.save?-0.12:0) + (b.p||0);
+    return bs-as;
+  });
+  const need = info.need;
+  const rec = [];
+  for (const c of cands){
+    if (rec.find(x => x.team===c.team || x.opp===c.team || x.team===c.opp)) continue;
+    if (c.save && rec.length && rec[rec.length-1].p-c.p < 0.08) continue;
+    rec.push(c);
+    if (rec.length>=need) break;
+  }
+  return {cands, rec};
+}
+
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.style.display="block";
+  setTimeout(()=>el.style.display="none", 1600);
+}
+
+function renderHeader(){
+  const rec = record();
+  document.getElementById("sWins").textContent = rec.w+"–"+rec.l;
+  document.getElementById("sLeft").textContent = rec.left;
+  document.getElementById("sMargin").textContent = (rec.margin>0?"+":"")+rec.margin;
+  document.getElementById("sNeed").textContent = rec.graded+"/32";
+  const bar = document.getElementById("weekbar");
+  bar.innerHTML = "";
+  for (let w=1;w<=17;w++){
+    const b = document.createElement("button");
+    b.className = "wk"+(w===week?" on":"")+((state.picks[w]||[]).length?" done":"");
+    b.textContent = w;
+    b.onclick = () => {
+      week=w; state.week=w; save(); render();
+      const has = (WEEKS[w].games||[]).some(g => state.lines[w+":"+g.away+"@"+g.home] != null && state.lines[w+":"+g.away+"@"+g.home] !== "");
+      if (!has) pullEspnLines(w, {silent:true}).then(n => { if (n) render(); });
+    };
+    bar.appendChild(b);
+  }
+}
+
+function renderWeek(){
+  const info = WEEKS[week];
+  const used = usedMap();
+  const picks = state.picks[week] || [];
+  const {cands, rec} = recommend(week);
+  const recSet = new Set(rec.map(r=>r.team));
+  let html = `<div class="card"><div class="row"><div>
+      <b>Week ${week}</b> <span class="badge">${info.label}</span>
+      <div class="note">${info.need} pick${info.need>1?"s":""} · Sunday deadline 11:30a ET unless noted</div>
+      ${info.early?`<div class="note warnc">${info.early}</div>`:""}
+      ${info.byes?`<div class="note">Byes: ${info.byes.join(", ")}</div>`:""}
+    </div></div>
+    <div class="actions">
+      <button class="btn good" id="pullLines">Refresh lines + news</button>
+      <button class="btn good" id="applyRec">Apply suggested</button>
+      <button class="btn ghost" id="emailPicks">Email picks</button>
+      <button class="btn ghost" id="clearWk">Clear week</button>
+    </div>
+    <div class="note">Live suggested: <b>${rec.map(r=>r.team+" ("+Math.round(r.p*100)+"%)").join(" + ")||"—"}</b></div>
+    <div class="note">Season plan: <b>${(PLAN[week]?PLAN[week].picks.join(" + "):"—")}</b></div>
+  </div>`;
+  const planSet = new Set((PLAN[week]&&PLAN[week].picks)||[]);
+  const liveSet = new Set(rec.map(r=>r.team));
+  const extra = rec.map(r=>r.team).filter(t=>!planSet.has(t));
+  const missing = [...planSet].filter(t=>!liveSet.has(t));
+  if (extra.length || missing.length){
+    html += `<div class="card conflict"><b>Plan vs live conflict</b>
+      <div class="note">Plan wants ${[...planSet].join(" + ")||"—"}. Live odds want ${rec.map(r=>r.team).join(" + ")||"—"}.</div>
+      <div class="note">${missing.length?("Plan still likes "+missing.join(", ")+" — SAVE unless this week is a lock. "):""}${extra.length?("Live is pushing "+extra.join(", ")+" off-plan."):""}</div>
+      <div class="note">Apply suggested uses live odds. Tap the plan teams yourself if you want the year map.</div>
+    </div>`;
+  }
+
+  const anyMeta = (info.games||[]).map(g=>state.lineMeta[week+":"+g.away+"@"+g.home]).find(Boolean);
+  html += `<div class="card"><div class="row"><b>Lines</b><span class="note">${anyMeta? (anyMeta.src||"ESPN")+" · home spread":"Home spread · tap Pull live lines"}</span></div>`;
+  info.games.forEach(g=>{
+    const key = week+":"+g.away+"@"+g.home;
+    const val = state.lines[key] != null ? state.lines[key] : (g.homeSpread!=null?g.homeSpread:"");
+    html += `<div class="row" style="margin-top:6px">
+      <span class="note">${g.away} @ ${g.home} · ${g.when} · ${gameDue(g)}${g.note?" · "+g.note:""}</span>
+      <input class="spread" data-line="${key}" value="${val}" placeholder="e.g. -7" />
+    </div>`;
+  });
+  html += `</div>`;
+
+  info.games.forEach(g=>{
+    const sides = [g.away,g.home].map(team=>{
+      const takenElse = used[team] && used[team]!==week;
+      const isPick = picks.includes(team);
+      const ts = teamSpread(week,g,team);
+      const meta = state.lineMeta[week+":"+g.away+"@"+g.home] || {};
+      const ml = team===g.home ? meta.homeML : meta.awayML;
+      const p = parseAmerican(ml) || spreadToProb(ts);
+      const note = teamBlurb(team);
+      const cand = cands.find(c=>c.team===team);
+      const cls = ["side", isPick?"pick":"", takenElse?"used":"", cand&&cand.save?"save":""].join(" ");
+      const rest = restRisk(team, week);
+      const onPlan = planSet.has(team);
+      const badge = takenElse ? `used Wk ${used[team]}` : isPick ? "PICK" : recSet.has(team) ? "SUGGEST" : cand&&cand.save ? "SAVE" : rest ? "REST" : note.flag ? "CHECK" : onPlan ? "PLAN" : "";
+      return `<button class="${cls}" data-pick="${team}">
+        <div class="abbr">${team}${onPlan&&!isPick?' <span class="chip plan">PLAN</span>':""}${rest?' <span class="chip rest">REST</span>':""}</div>
+        <div class="meta">${TEAMS[team].name}${team===g.home?" · home":" · away"}</div>
+        <div class="prob ${p>=0.7?"hot":""}">${p?Math.round(p*100)+"%":"—"}${ts!=null?" · "+(ts>0?"+":"")+ts.toFixed(1):""}</div>
+        <div class="meta">${badge}</div>
+        <div class="blurb ${note.qbOut||rest?"bad":/Out|IR|Doubtful|DNP/.test(note.line)?"warn":""}">${rest?"Contender rest risk in W16–17. ":" "}${note.line||""}</div>
+      </button>`;
+    }).join(`<div class="mid">${g.when}<br><span class="chip due">${gameDue(g)}</span></div>`);
+    html += `<div class="card"><div class="game">${sides}</div></div>`;
+  });
+
+  html += `<div class="card"><b>Your Week ${week} card</b>
+    <div style="font-size:22px;margin:8px 0">${(picks.join("  +  ")||"No picks yet")}</div>
+    <div class="note">${picks.length}/${info.need} selected. Tap a team to add/remove.</div></div>`;
+  document.getElementById("app").innerHTML = html;
+
+  document.querySelectorAll("[data-pick]").forEach(btn=>{
+    btn.onclick = () => togglePick(btn.dataset.pick);
+  });
+  document.querySelectorAll("[data-line]").forEach(inp=>{
+    inp.onchange = () => {
+      const v = inp.value.trim();
+      state.lines[inp.dataset.line] = v===""? "": Number(v);
+      save(); render();
+    };
+  });
+  document.getElementById("pullLines").onclick = async () => {
+    await refreshWeekData(week);
+    render();
+  };
+  document.getElementById("applyRec").onclick = () => {
+    state.picks[week] = rec.map(r=>r.team);
+    save(); render(); toast("Suggested picks applied");
+  };
+  document.getElementById("clearWk").onclick = () => {
+    state.picks[week] = [];
+    save(); render();
+  };
+  document.getElementById("emailPicks").onclick = emailPicks;
+}
+
+function togglePick(team){
+  const used = usedMap();
+  if (used[team] && used[team]!==week) { toast(team+" already used in Week "+used[team]); return; }
+  const info = WEEKS[week];
+  let arr = (state.picks[week]||[]).slice();
+  if (arr.includes(team)) arr = arr.filter(t=>t!==team);
+  else {
+    if (arr.length>=info.need) { toast("Week "+week+" already has "+info.need+" pick(s)"); return; }
+    const g = info.games.find(x=>x.home===team||x.away===team);
+    if (g && (arr.includes(g.home)||arr.includes(g.away))) { toast("Can't pick both sides"); return; }
+    arr.push(team);
+  }
+  state.picks[week]=arr; save(); render();
+}
+
+function weekEmailBody(){
+  const picks = state.picks[week]||[];
+  const rec = record();
+  const plan = PLAN[week];
+  return `Week ${week} picks: ${(picks.join(" and ")||"(none yet)")}
+
+Proposed this week: ${(plan?plan.picks.join(" and "):"—")}
+${plan?plan.why:""}
+
+Card so far: ${rec.w}-${rec.l}, net margin ${rec.margin>0?"+":""}${rec.margin}
+Still unused: ${remaining().join(", ")||"none"}
+
+— RIK's 2026 Pick-All`;
+}
+function seasonEmailBody(){
+  const used = usedMap();
+  let lines = ["2026 Pick-All proposed card (re-rank weekly)\n"];
+  for (let w=1;w<=17;w++){
+    const actual = state.picks[w]||[];
+    const plan = PLAN[w].picks;
+    const mark = actual.length ? actual.join(" + ") : plan.join(" + ");
+    const tag = actual.length ? "LOCKED" : "PLAN";
+    lines.push(`Wk ${w} [${tag}]: ${mark} — ${PLAN[w].why}`);
+  }
+  lines.push("\nUnused now: "+(remaining().join(", ")||"none"));
+  return lines.join("\n");
+}
+function openMail(subject, body){
+  const url = "mailto:"+COMMISH+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+  window.location.href = url;
+}
+function emailPicks(){
+  const picks = state.picks[week]||[];
+  if (!picks.length) { toast("Pick a team first"); return; }
+  openMail("Pick-All 2026 — Week "+week+" picks", weekEmailBody());
+}
+function emailPlan(){
+  openMail("Pick-All 2026 — season plan", seasonEmailBody());
+}
+function applyPlanGaps(){
+  const used = usedMap();
+  let n=0;
+  for (let w=1;w<=17;w++){
+    const have = state.picks[w]||[];
+    if (have.length) continue;
+    const next = PLAN[w].picks.filter(t => !used[t]);
+    if (!next.length) continue;
+    state.picks[w] = next.slice(0, WEEKS[w].need);
+    next.forEach(t => used[t]=w);
+    n++;
+  }
+  save(); render();
+  toast(n?("Filled "+n+" empty week(s) from the plan"):"No empty weeks to fill");
+}
+
+function renderRoster(){
+  const used = usedMap();
+  const left = remaining();
+  let html = `<div class="card"><b>Inventory</b>
+    <div class="note">${left.length} unused · purple border = elite · red = dump pile</div></div>
+    <div class="grid32">`;
+  Object.keys(TEAMS).sort().forEach(t=>{
+    const u = used[t];
+    const r = u ? ((state.results[u]||{})[t]||{}) : {};
+    html += `<div class="tm ${TEAMS[t].tier} ${u?"gone":""}">
+      <b>${t}</b>
+      ${u?`W${u} ${r.wl||""}`:`bye ${TEAMS[t].bye}`}<br>
+      <span class="badge">${TEAMS[t].wt} wins</span>
+    </div>`;
+  });
+  html += `</div><h2>Still available</h2><div class="card note">${left.join(" · ")||"None"}</div>`;
+  html += `<h2>Dump pile still live</h2><div class="card note">${left.filter(t=>TEAMS[t].tier==="dump").join(" · ")||"All dumped"}</div>`;
+  html += `<h2>Elites still live</h2><div class="card note">${left.filter(t=>TEAMS[t].tier==="elite").join(" · ")||"All spent"}</div>`;
+  document.getElementById("app").innerHTML = html;
+}
+
+function renderPlan(){
+  const used = usedMap();
+  let html = `<div class="card"><b>Proposed card for the year</b>
+    <div class="note">Built from current win totals, Week 1 lines, and each team’s easiest remaining opponent. Lock Week 1 now. Re-price later weeks when those lines go up. Weeks you already picked stay put.</div></div>
+    <div class="actions">
+      <button class="btn good" id="fillPlan">Fill empty weeks</button>
+      <button class="btn ghost" id="mailPlan">Email season plan</button>
+    </div>
+    <div class="card" style="overflow-x:auto"><table>
+      <tr><th>Wk</th><th>Plan</th><th>Your card</th><th>Spot</th></tr>`;
+  for (let w=1;w<=17;w++){
+    const actual = state.picks[w]||[];
+    const p = PLAN[w].picks.join(" + ");
+    const a = actual.length ? actual.join(" + ") : "—";
+    html += `<tr>
+      <td><b>${w}</b></td>
+      <td>${p}</td>
+      <td>${actual.length?`<span class="ok">${a}</span>`:a}</td>
+      <td class="note">${PLAN[w].why}</td>
+    </tr>`;
+  }
+  html += `</table></div>
+    <div class="card" style="overflow-x:auto"><b>Team → week</b>
+    <table><tr><th>Team</th><th>Plan</th><th>Used</th><th>Best leftover mismatch</th></tr>`;
+  Object.keys(TEAMS).sort((a,b)=>(SUGGEST[a]||99)-(SUGGEST[b]||99)).forEach(t=>{
+    const fut = bestFuture(t, used[t]?used[t]:0);
+    html += `<tr>
+      <td><b>${t}</b></td>
+      <td>W${SUGGEST[t]}</td>
+      <td>${used[t]?`<span class="ok">W${used[t]}</span>`:"—"}</td>
+      <td>${fut.week?`W${fut.week} ${fut.home?"":"@ "}${fut.opp}`:"—"}</td>
+    </tr>`;
+  });
+  html += `</table></div>`;
+  document.getElementById("app").innerHTML = html;
+  document.getElementById("fillPlan").onclick = applyPlanGaps;
+  document.getElementById("mailPlan").onclick = emailPlan;
+}
+
+function renderResults(){
+  const rec = record();
+  const pace = rec.graded ? (rec.w/rec.graded*32) : 0;
+  let html = `<div class="card">
+      <b>Pool score</b>
+      <div style="font-size:28px;margin:6px 0">${rec.w}–${rec.l}</div>
+      <div>Tiebreaker net margin <b>${rec.margin>0?"+":""}${rec.margin}</b></div>
+      <div class="note">${rec.graded} graded · ${rec.pending} pending · ${rec.left} teams still unused</div>
+      <div class="note">${rec.graded?("Pace: "+pace.toFixed(1)+" wins / 32"):"Grade games after they finish."} · Money is usually top 10–15%. Target 22–25 wins.</div>
+    </div>
+    <div class="actions">
+      <button class="btn good" id="gradeEspn">Grade finished games</button>
+    </div>
+    <div class="card note">Official rank = most wins out of 32. Ties count as losses. Tiebreaker = your team's score minus opponent's score, summed over every pick (wins add, losses subtract). Enter the raw point difference; W/L sets the sign.</div>`;
+
+  let any=false;
+  for (let w=1;w<=17;w++){
+    const arr = state.picks[w]||[];
+    if (!arr.length) continue;
+    any=true;
+    const wk = rec.byWeek[w];
+    html += `<div class="card"><div class="row"><b>Week ${w}</b><span class="badge">${wk.w}–${wk.l}${wk.pending?" · "+wk.pending+" open":""} · ${wk.margin>0?"+":""}${wk.margin}</span></div>`;
+    arr.forEach(t=>{
+      const r = ((state.results[w]||{})[t])||{wl:"",margin:""};
+      const g = findGame(w,t);
+      const opp = g ? (g.home===t?g.away:g.home) : "";
+      const loc = g ? (g.home===t?"vs":"@") : "";
+      html += `<div style="margin-top:10px">
+        <div class="row">
+          <div><b>${t}</b> <span class="note">${loc} ${opp}${r.score?" · "+r.score:""}</span></div>
+          <span class="badge ${r.wl==="W"?"good":r.wl==="L"?"bad":""}">${r.wl==="W"?"WIN":r.wl==="L"?"LOSS":"OPEN"}</span>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <select data-wl="${w}:${t}">
+            <option value="" ${!r.wl?"selected":""}>Pending</option>
+            <option value="W" ${r.wl==="W"?"selected":""}>Win</option>
+            <option value="L" ${r.wl==="L"?"selected":""}>Loss / tie</option>
+          </select>
+          <input class="spread" data-mg="${w}:${t}" value="${r.margin==null||r.margin===""?"":r.margin}" placeholder="margin" />
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  if (!any) html += `<div class="card note">No picks recorded yet. Lock Week 1 on This Week first.</div>`;
+
+  html += `<div class="card" style="overflow-x:auto"><b>Week-by-week</b>
+    <table><tr><th>Wk</th><th>Picks</th><th>W-L</th><th>Margin</th></tr>`;
+  for (let w=1;w<=17;w++){
+    const arr = state.picks[w]||[];
+    const wk = rec.byWeek[w];
+    html += `<tr><td>${w}</td><td>${arr.join(" + ")||"—"}</td><td>${arr.length?(wk.w+"–"+wk.l):"—"}</td><td>${arr.length&&!wk.pending?(wk.margin>0?"+":"")+wk.margin:"—"}</td></tr>`;
+  }
+  html += `</table></div>`;
+  html += `<div class="actions"><button class="btn warn" id="resetAll">Reset all data</button></div>`;
+  document.getElementById("app").innerHTML = html;
+
+  document.getElementById("gradeEspn").onclick = async () => {
+    toast("Checking ESPN finals…");
+    let total=0;
+    const weeks = Object.keys(state.picks).map(Number).filter(w=> (state.picks[w]||[]).length);
+    for (const w of weeks) total += await pullEspnResults(w);
+    toast(total? ("Graded "+total+" pick(s)") : "No finished games on your card yet");
+    render();
+  };
+  document.querySelectorAll("[data-wl]").forEach(sel=>{
+    sel.onchange = () => {
+      const [w,t] = sel.dataset.wl.split(":");
+      state.results[w]=state.results[w]||{};
+      const prev = state.results[w][t]||{};
+      const wl = sel.value;
+      state.results[w][t]=Object.assign({}, prev, {wl, margin: signedMargin(wl, prev.margin)});
+      save(); render();
+    };
+  });
+  document.querySelectorAll("[data-mg]").forEach(inp=>{
+    inp.onchange = () => {
+      const [w,t] = inp.dataset.mg.split(":");
+      state.results[w]=state.results[w]||{};
+      const prev = state.results[w][t]||{};
+      const wl = prev.wl||"";
+      state.results[w][t]=Object.assign({}, prev, {margin: wl? signedMargin(wl, inp.value): inp.value});
+      save(); render();
+    };
+  });
+  document.getElementById("resetAll").onclick = () => {
+    if (!confirm("Erase picks, lines, and results?")) return;
+    localStorage.removeItem(KEY);
+    location.reload();
+  };
+}
+
+function renderHelp(){
+  document.getElementById("app").innerHTML = `
+    <div class="card"><b>What this pool scores</b>
+      <div class="note">
+        Rank = most winning picks out of 32. That is the only primary score.<br>
+        A tie game is a loss for both teams.<br>
+        Tiebreaker = net margin across all 32 picks: (your team’s points − opponent’s points), added up. A 27–13 win is +14. A 17–20 loss is −3.<br>
+        Invalid / missed picks the commish cannot fix count as losses and void your tiebreaker, except the written caveat if two voided cards are tied.<br>
+        Weeks 1–15: two teams. Weeks 16–17: one team. Week 18 unused. Each NFL team once. No bye-week picks.
+      </div>
+    </div>
+    <div class="card"><b>What this app tracks</b>
+      <div class="note">
+        • Your 32-team card, week by week.<br>
+        • Remaining teams, byes, and “save vs spend” flags.<br>
+        • Live spreads and moneylines from ESPN / DraftKings.<br>
+        • ESPN injury report (Out / Doubtful / IR / Questionable on skill and OL) plus matching headlines, one line per team.<br>
+        • QB-out teams get their win % cut so they fall off the suggested card.<br>
+        • Results: win–loss and signed margin, plus a running pool score at the top.<br>
+        • Pace (wins projected to 32) after games are graded.<br>
+        It does <i>not</i> replace the commish spreadsheet. That sheet is official.
+      </div>
+    </div>
+    <div class="card"><b>Weekly loop</b>
+      <div class="note">
+        1. This Week → Refresh lines + news (spreads, moneylines, injuries, headlines).<br>
+        2. Apply suggested or tap two teams (one in Weeks 16–17).<br>
+        3. Email picks — opens Mail to goforgin123@gmail.com. Check the confirmation line.<br>
+        4. After the week, Results → Grade finished games. Override anything ESPN missed.<br>
+        5. Re-rank leftover teams next Tuesday.<br>
+        Saturday 9:00a ET: Grok pings you with that week’s two names, plan-vs-live, and a mail-ready blurb.
+      </div>
+    </div>
+    <div class="card"><b>How suggestions work</b>
+      <div class="note">
+        Teams still on your card are ranked by this week’s win probability (moneyline if ESPN has one, otherwise the spread).<br>
+        Elite teams get SAVE when a clearly worse opponent is still ahead and this week is not a lock (~72%+). That is why Lions are not auto-spent in Week 1.<br>
+        You cannot pick both sides, a used team, or a bye.
+      </div>
+    </div>
+    <div class="card"><b>Week 1 lean</b>
+      <div class="note">Chargers vs Cardinals and Jaguars vs Browns. Do not spend Rams, Seahawks, Chiefs, or Bills on short numbers.</div>
+    </div>
+    <div class="card"><b>Deadlines</b>
+      <div class="note">
+        Sunday slate: 11:30a ET.<br>
+        Games before Sunday: 1 hour before kickoff.<br>
+        9:30a ET Europe games: Saturday 11:00p ET.<br>
+        Commish: goforgin123@gmail.com · backup phone in the rules: 919-302-2247.<br>
+        What’s on the official spreadsheet is the bet.
+      </div>
+    </div>
+    <div class="card"><b>iPhone</b>
+      <div class="note">Open this file in Safari → Share → Add to Home Screen. Scores and picks live in this browser. Clearing Safari data wipes the card.</div>
+    </div>`;
+}
+
+function render(){
+  renderHeader();
+  if (tab==="week") renderWeek();
+  else if (tab==="roster") renderRoster();
+  else if (tab==="plan") renderPlan();
+  else if (tab==="results") renderResults();
+  else renderHelp();
+}
+
+document.querySelectorAll("nav.tabs button").forEach(b=>{
+  b.onclick = () => {
+    tab = b.dataset.tab;
+    document.querySelectorAll("nav.tabs button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    render();
+  };
+});
+try {
+  render();
+  refreshWeekData(week, {silent:true}).then(() => render()).catch(function(){ render(); });
+} catch (err) {
+  var el = document.getElementById("app");
+  if (el) el.innerHTML = '<div class="card"><b>Could not start</b><div class="note">'+String(err)+'</div><div class="note">Open this from the Grok chat file preview, not the Files app. Files on iPhone shows a snapshot and will not run the tool.</div></div>';
+}
+</script>
+</body>
+</html>
